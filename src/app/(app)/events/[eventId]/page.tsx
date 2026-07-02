@@ -98,7 +98,7 @@ export default function EventDetailPage() {
     );
   }
 
-  const { event, contacts, members, organizations, tags } = data;
+  const { event, contacts, members, companies, tags } = data;
 
   return (
     <div className="space-y-6">
@@ -249,18 +249,18 @@ export default function EventDetailPage() {
             </Card>
           )}
 
-          {organizations.length > 0 && (
+          {companies.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
-                  Exhibiting Organizations
+                  Companies
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {organizations.map((org) => (
-                    <div key={org.organization_id} className="flex items-center gap-3">
+                  {companies.map((org) => (
+                    <div key={org.company_id} className="flex items-center gap-3">
                       <Avatar size="sm">
                         {org.logo_url && <AvatarImage src={org.logo_url} />}
                         <AvatarFallback>{getInitials(org.name)}</AvatarFallback>

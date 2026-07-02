@@ -42,7 +42,7 @@ const tabs = [
 ];
 
 const moreItems = [
-  { label: 'Organizations', href: '/organizations', icon: Building2 },
+  { label: 'Companies', href: '/companies', icon: Building2 },
   { label: 'Events', href: '/events', icon: CalendarDays },
   { label: 'Activities', href: '/activities', icon: Activity },
   { label: 'Settings', href: '/settings', icon: Settings },

@@ -53,7 +53,7 @@ export default function DealDetailPage() {
 
   const deal = data?.deal;
   const contacts = data?.contacts ?? [];
-  const organizations = data?.organizations ?? [];
+  const companies = data?.companies ?? [];
   const tags = data?.tags ?? [];
   const stages = stagesData?.stages?.sort((a, b) => a.order - b.order) ?? [];
 
@@ -328,24 +328,24 @@ export default function DealDetailPage() {
             </Card>
           )}
 
-          {/* Organizations */}
-          {organizations.length > 0 && (
+          {/* Companies */}
+          {companies.length > 0 && (
             <Card className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Building2 className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-sm font-semibold">Organizations</h3>
+                <h3 className="text-sm font-semibold">Companies</h3>
               </div>
               <div className="space-y-2">
-                {organizations.map((org) => (
+                {companies.map((org) => (
                   <div
-                    key={org.organization_id}
+                    key={org.company_id}
                     className="flex items-center gap-3 rounded-lg border p-2.5"
                   >
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-xs font-medium">
                       {getInitials(org.name)}
                     </span>
                     <Link
-                      href={`/organizations/${org.organization_id}`}
+                      href={`/companies/${org.company_id}`}
                       className="text-sm font-medium hover:underline"
                     >
                       {org.name}

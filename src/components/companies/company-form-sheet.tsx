@@ -24,11 +24,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useCreateOrganization, useUpdateOrganization } from '@/lib/hooks/use-organizations';
-import { ORGANIZATION_SIZES } from '@/lib/utils/constants';
-import type { Organization } from '@/lib/api/types';
+import { useCreateCompany, useUpdateCompany } from '@/lib/hooks/use-companies';
+import { COMPANY_SIZES } from '@/lib/utils/constants';
+import type { Company } from '@/lib/api/types';
 
-const orgFormSchema = z.object({
+const companyFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email').or(z.literal('')).optional(),
   phone: z.string().optional(),
@@ -40,21 +40,21 @@ const orgFormSchema = z.object({
   notes: z.string().optional(),
 });
 
-type OrgFormValues = z.infer<typeof orgFormSchema>;
+type CompanyFormValues = z.infer<typeof companyFormSchema>;
 
-interface OrgFormSheetProps {
+interface CompanyFormSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  organization?: Organization;
+  company?: Company;
 }
 
-export function OrgFormSheet({ open, onOpenChange, organization }: OrgFormSheetProps) {
-  const isEditing = !!organization;
-  const createOrg = useCreateOrganization();
-  const updateOrg = useUpdateOrganization();
+export function CompanyFormSheet({ open, onOpenChange, company }: CompanyFormSheetProps) {
+  const isEditing = !!company;
+  const createCompany = useCreateCompany();
+  const updateCompany = useUpdateCompany();
 
-  const form = useForm<OrgFormValues>({
-    resolver: zodResolver(orgFormSchema),
+  const form = useForm<CompanyFormValues>({
+    resolver: zodResolver(companyFormSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -71,22 +71,22 @@ export function OrgFormSheet({ open, onOpenChange, organization }: OrgFormSheetP
   useEffect(() => {
     if (open) {
       form.reset({
-        name: organization?.name ?? '',
-        email: organization?.email ?? '',
-        phone: organization?.phone ?? '',
-        website: organization?.website ?? '',
-        industry: organization?.industry ?? '',
-        location: organization?.location ?? '',
-        size: organization?.size ?? '',
-        description: organization?.description ?? '',
-        notes: organization?.notes ?? '',
+        name: company?.name ?? '',
+        email: company?.email ?? '',
+        phone: company?.phone ?? '',
+        website: company?.website ?? '',
+        industry: company?.industry ?? '',
+        location: company?.location ?? '',
+        size: company?.size ?? '',
+        description: company?.description ?? '',
+        notes: company?.notes ?? '',
       });
     }
-  }, [open, organization, form]);
+  }, [open, company, form]);
 
-  const isPending = createOrg.isPending || updateOrg.isPending;
+  const isPending = createCompany.isPending || updateCompany.isPending;
 
-  function onSubmit(values: OrgFormValues) {
+  function onSubmit(values: CompanyFormValues) {
     const payload = {
       ...values,
       email: values.email || null,
@@ -100,28 +100,28 @@ export function OrgFormSheet({ open, onOpenChange, organization }: OrgFormSheetP
     };
 
     if (isEditing) {
-      updateOrg.mutate(
-        { organization_id: organization.organization_id, ...payload },
+      updateCompany.mutate(
+        { company_id: company.company_id, ...payload },
         {
           onSuccess: () => {
-            toast.success('Organization updated');
+            toast.success('Company updated');
             onOpenChange(false);
           },
           onError: (err) => {
-            toast.error(err.message || 'Failed to update organization');
+            toast.error(err.message || 'Failed to update company');
           },
         },
       );
     } else {
-      createOrg.mutate(
+      createCompany.mutate(
         payload,
         {
           onSuccess: () => {
-            toast.success('Organization created');
+            toast.success('Company created');
             onOpenChange(false);
           },
           onError: (err) => {
-            toast.error(err.message || 'Failed to create organization');
+            toast.error(err.message || 'Failed to create company');
           },
         },
       );
@@ -132,17 +132,17 @@ export function OrgFormSheet({ open, onOpenChange, organization }: OrgFormSheetP
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="sm:max-w-md">
         <SheetHeader>
-          <SheetTitle>{isEditing ? 'Edit Organization' : 'New Organization'}</SheetTitle>
+          <SheetTitle>{isEditing ? 'Edit Company' : 'New Company'}</SheetTitle>
           <SheetDescription>
             {isEditing
-              ? 'Update the organization details below.'
-              : 'Fill in the details to create a new organization.'}
+              ? 'Update the company details below.'
+              : 'Fill in the details to create a new company.'}
           </SheetDescription>
         </SheetHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4">
           <form
-            id="org-form"
+            id="company-form"
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-4 pb-4"
           >
@@ -226,7 +226,7 @@ export function OrgFormSheet({ open, onOpenChange, organization }: OrgFormSheetP
                   <SelectValue placeholder="Select company size" />
                 </SelectTrigger>
                 <SelectContent>
-                  {ORGANIZATION_SIZES.map((s) => (
+                  {COMPANY_SIZES.map((s) => (
                     <SelectItem key={s.value} value={s.value}>
                       {s.label}
                     </SelectItem>
@@ -239,7 +239,7 @@ export function OrgFormSheet({ open, onOpenChange, organization }: OrgFormSheetP
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
-                placeholder="Brief description of the organization"
+                placeholder="Brief description of the company"
                 rows={3}
                 {...form.register('description')}
               />
@@ -260,7 +260,7 @@ export function OrgFormSheet({ open, onOpenChange, organization }: OrgFormSheetP
         <SheetFooter>
           <Button
             type="submit"
-            form="org-form"
+            form="company-form"
             disabled={isPending}
           >
             {isPending
@@ -269,7 +269,7 @@ export function OrgFormSheet({ open, onOpenChange, organization }: OrgFormSheetP
                 : 'Creating...'
               : isEditing
                 ? 'Save Changes'
-                : 'Create Organization'}
+                : 'Create Company'}
           </Button>
         </SheetFooter>
       </SheetContent>

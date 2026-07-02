@@ -39,8 +39,8 @@ export interface Contact {
   updated_at: number;
 }
 
-export interface Organization {
-  organization_id: string;
+export interface Company {
+  company_id: string;
   workspace_id: string;
   name: string;
   email: string | null;
@@ -159,7 +159,7 @@ export interface Relationship {
 export interface PaginatedResponse<T> {
   items?: T[];
   contacts?: T[];
-  organizations?: T[];
+  companies?: T[];
   deals?: T[];
   events?: T[];
   tasks?: T[];

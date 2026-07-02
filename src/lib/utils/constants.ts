@@ -49,7 +49,7 @@ export const DEAL_STAGE_COLORS: Record<string, string> = {
   closed_lost: '#ef4444',
 };
 
-export const ORGANIZATION_SIZES = [
+export const COMPANY_SIZES = [
   { value: '1-10', label: '1-10 employees' },
   { value: '11-50', label: '11-50 employees' },
   { value: '51-200', label: '51-200 employees' },

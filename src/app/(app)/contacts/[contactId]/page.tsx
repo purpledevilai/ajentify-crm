@@ -57,7 +57,7 @@ export default function ContactDetailPage() {
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
 
   const contact = data?.contact;
-  const organizations = data?.organizations ?? [];
+  const companies = data?.companies ?? [];
   const tags = data?.tags ?? [];
   const dealRelationships = data?.deal_relationships ?? [];
 
@@ -245,18 +245,18 @@ export default function ContactDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Organizations */}
-          {organizations.length > 0 && (
+          {/* Companies */}
+          {companies.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Organizations</CardTitle>
+                <CardTitle>Companies</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {organizations.map((org) => (
+                  {companies.map((org) => (
                     <Link
-                      key={org.organization_id}
-                      href={`/organizations/${org.organization_id}`}
+                      key={org.company_id}
+                      href={`/companies/${org.company_id}`}
                       className="flex items-center gap-2 rounded-md p-2 hover:bg-muted/50 transition-colors"
                     >
                       <Building2 className="h-4 w-4 text-muted-foreground" />

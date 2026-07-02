@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Loader2,
   LogOut,
@@ -260,9 +261,11 @@ function ProfileTab() {
 function WorkspaceTab() {
   const { activeWorkspace } = useWorkspace();
   const { refreshWorkspaces, logout } = useAuth();
+  const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const { register, handleSubmit } = useForm({
     defaultValues: {
@@ -294,17 +297,22 @@ function WorkspaceTab() {
 
   async function handleDeleteWorkspace() {
     if (!activeWorkspace) return;
+    const deletingId = activeWorkspace.workspace_id;
     setIsDeleting(true);
+    setDialogOpen(false);
     try {
-      await wsRpc('delete_workspace', activeWorkspace.workspace_id, {});
+      await wsRpc('delete_workspace', deletingId, {});
+      setDeleteConfirm('');
       toast.success('Workspace deleted.');
       await refreshWorkspaces();
+      router.push('/dashboard');
     } catch (err) {
       if (err instanceof ApiError) {
         toast.error(err.message);
       } else {
         toast.error('Failed to delete workspace.');
       }
+    } finally {
       setIsDeleting(false);
     }
   }
@@ -356,7 +364,7 @@ function WorkspaceTab() {
               placeholder="Type workspace name..."
             />
           </div>
-          <AlertDialog>
+          <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <AlertDialogTrigger
               disabled={isDeleting || deleteConfirm !== activeWorkspace?.name}
               className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md bg-destructive px-4 py-2 text-sm font-medium text-white shadow-xs transition-all hover:bg-destructive/90 disabled:pointer-events-none disabled:opacity-50"

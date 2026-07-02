@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { PageHeader } from '@/components/layouts/page-header';
-import { OrgFormSheet } from '@/components/organizations/org-form-sheet';
+import { CompanyFormSheet } from '@/components/companies/company-form-sheet';
 import { ActivityTimeline } from '@/components/shared/activity-timeline';
 import { EntityTasks } from '@/components/shared/entity-tasks';
 import { Button } from '@/components/ui/button';
@@ -23,9 +23,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useOrganization, useDeleteOrganization } from '@/lib/hooks/use-organizations';
+import { useCompany, useDeleteCompany } from '@/lib/hooks/use-companies';
 import { formatDate, getInitials } from '@/lib/utils/format';
-import { ORGANIZATION_SIZES } from '@/lib/utils/constants';
+import { COMPANY_SIZES } from '@/lib/utils/constants';
 import {
   Building2,
   Mail,
@@ -41,34 +41,34 @@ import { toast } from 'sonner';
 
 function getSizeLabel(value: string | null): string | null {
   if (!value) return null;
-  const found = ORGANIZATION_SIZES.find((s) => s.value === value);
+  const found = COMPANY_SIZES.find((s) => s.value === value);
   return found ? found.label : value;
 }
 
-export default function OrganizationDetailPage() {
-  const params = useParams<{ organizationId: string }>();
+export default function CompanyDetailPage() {
+  const params = useParams<{ companyId: string }>();
   const router = useRouter();
-  const orgId = params.organizationId;
+  const companyId = params.companyId;
 
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const { data, isLoading } = useOrganization(orgId);
-  const deleteOrg = useDeleteOrganization();
+  const { data, isLoading } = useCompany(companyId);
+  const deleteCompanyMutation = useDeleteCompany();
 
-  const organization = data?.organization;
+  const company = data?.company;
   const contacts = data?.contacts ?? [];
   const tags = data?.tags ?? [];
 
   function handleDelete() {
-    if (!orgId) return;
-    deleteOrg.mutate(orgId, {
+    if (!companyId) return;
+    deleteCompanyMutation.mutate(companyId, {
       onSuccess: () => {
-        toast.success('Organization deleted');
-        router.push('/organizations');
+        toast.success('Company deleted');
+        router.push('/companies');
       },
       onError: (err) => {
-        toast.error(err.message || 'Failed to delete organization');
+        toast.error(err.message || 'Failed to delete company');
       },
     });
   }
@@ -91,16 +91,16 @@ export default function OrganizationDetailPage() {
     );
   }
 
-  if (!organization) {
+  if (!company) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <Building2 className="h-10 w-10 text-muted-foreground/50" />
-        <h3 className="mt-4 text-lg font-semibold">Organization not found</h3>
+        <h3 className="mt-4 text-lg font-semibold">Company not found</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          This organization may have been deleted.
+          This company may have been deleted.
         </p>
-        <Button className="mt-4" variant="outline" onClick={() => router.push('/organizations')}>
-          Back to Organizations
+        <Button className="mt-4" variant="outline" onClick={() => router.push('/companies')}>
+          Back to Companies
         </Button>
       </div>
     );
@@ -109,10 +109,10 @@ export default function OrganizationDetailPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={organization.name}
+        title={company.name}
         breadcrumbs={[
-          { label: 'Organizations', href: '/organizations' },
-          { label: organization.name },
+          { label: 'Companies', href: '/companies' },
+          { label: company.name },
         ]}
         actions={
           <div className="flex items-center gap-2">
@@ -131,25 +131,24 @@ export default function OrganizationDetailPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left Column */}
         <div className="space-y-6 lg:col-span-2">
-          {/* Org Header Card */}
           <Card className="p-6">
             <div className="flex items-start gap-4">
               <Avatar size="lg">
-                {organization.logo_url && (
-                  <AvatarImage src={organization.logo_url} alt={organization.name} />
+                {company.logo_url && (
+                  <AvatarImage src={company.logo_url} alt={company.name} />
                 )}
                 <AvatarFallback className="text-lg">
-                  {getInitials(organization.name)}
+                  {getInitials(company.name)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 space-y-2">
-                <h2 className="text-xl font-semibold">{organization.name}</h2>
+                <h2 className="text-xl font-semibold">{company.name}</h2>
                 <div className="flex flex-wrap items-center gap-2">
-                  {organization.industry && (
-                    <Badge variant="secondary">{organization.industry}</Badge>
+                  {company.industry && (
+                    <Badge variant="secondary">{company.industry}</Badge>
                   )}
-                  {organization.size && (
-                    <Badge variant="outline">{getSizeLabel(organization.size)}</Badge>
+                  {company.size && (
+                    <Badge variant="outline">{getSizeLabel(company.size)}</Badge>
                   )}
                   {tags.map((tag) => (
                     <Badge
@@ -165,72 +164,70 @@ export default function OrganizationDetailPage() {
             </div>
           </Card>
 
-          {/* Details Card */}
           <Card className="p-6">
             <h3 className="mb-4 font-semibold">Details</h3>
             <div className="space-y-3">
-              {organization.email && (
+              {company.email && (
                 <div className="flex items-center gap-3 text-sm">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <a href={`mailto:${organization.email}`} className="hover:underline">
-                    {organization.email}
+                  <a href={`mailto:${company.email}`} className="hover:underline">
+                    {company.email}
                   </a>
                 </div>
               )}
-              {organization.phone && (
+              {company.phone && (
                 <div className="flex items-center gap-3 text-sm">
                   <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>{organization.phone}</span>
+                  <span>{company.phone}</span>
                 </div>
               )}
-              {organization.website && (
+              {company.website && (
                 <div className="flex items-center gap-3 text-sm">
                   <Globe className="h-4 w-4 text-muted-foreground" />
                   <a
-                    href={organization.website}
+                    href={company.website}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 hover:underline"
                   >
-                    {organization.website.replace(/^https?:\/\//, '')}
+                    {company.website.replace(/^https?:\/\//, '')}
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
               )}
-              {organization.location && (
+              {company.location && (
                 <div className="flex items-center gap-3 text-sm">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span>{organization.location}</span>
+                  <span>{company.location}</span>
                 </div>
               )}
 
-              {!organization.email && !organization.phone && !organization.website && !organization.location && (
+              {!company.email && !company.phone && !company.website && !company.location && (
                 <p className="text-sm text-muted-foreground">No contact details added yet.</p>
               )}
 
-              {organization.description && (
+              {company.description && (
                 <>
                   <Separator className="my-4" />
                   <div>
                     <h4 className="mb-1 text-sm font-medium text-muted-foreground">Description</h4>
-                    <p className="text-sm whitespace-pre-wrap">{organization.description}</p>
+                    <p className="text-sm whitespace-pre-wrap">{company.description}</p>
                   </div>
                 </>
               )}
 
-              {organization.notes && (
+              {company.notes && (
                 <>
                   <Separator className="my-4" />
                   <div>
                     <h4 className="mb-1 text-sm font-medium text-muted-foreground">Notes</h4>
-                    <p className="text-sm whitespace-pre-wrap">{organization.notes}</p>
+                    <p className="text-sm whitespace-pre-wrap">{company.notes}</p>
                   </div>
                 </>
               )}
             </div>
           </Card>
 
-          {/* People Section */}
           <Card className="p-6">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-semibold flex items-center gap-2">
@@ -240,7 +237,7 @@ export default function OrganizationDetailPage() {
             </div>
             {contacts.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                No contacts associated with this organization.
+                No contacts associated with this company.
               </p>
             ) : (
               <div className="space-y-3">
@@ -281,23 +278,23 @@ export default function OrganizationDetailPage() {
 
         {/* Right Column */}
         <div className="space-y-6">
-          <ActivityTimeline entityType="organization" entityId={orgId} />
-          <EntityTasks entityType="organization" entityId={orgId} />
+          <ActivityTimeline entityType="company" entityId={companyId} />
+          <EntityTasks entityType="company" entityId={companyId} />
         </div>
       </div>
 
-      <OrgFormSheet
+      <CompanyFormSheet
         open={editOpen}
         onOpenChange={setEditOpen}
-        organization={organization}
+        company={company}
       />
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Organization</AlertDialogTitle>
+            <AlertDialogTitle>Delete Company</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &ldquo;{organization.name}&rdquo;? This action cannot
+              Are you sure you want to delete &ldquo;{company.name}&rdquo;? This action cannot
               be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -306,9 +303,9 @@ export default function OrganizationDetailPage() {
             <AlertDialogAction
               variant="destructive"
               onClick={handleDelete}
-              disabled={deleteOrg.isPending}
+              disabled={deleteCompanyMutation.isPending}
             >
-              {deleteOrg.isPending ? 'Deleting...' : 'Delete'}
+              {deleteCompanyMutation.isPending ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

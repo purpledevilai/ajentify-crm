@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { wsRpc } from '@/lib/api/rpc';
 import { useWorkspace } from '@/lib/providers/workspace-provider';
-import type { CrmEvent, Contact, Organization, Member } from '@/lib/api/types';
+import type { CrmEvent, Contact, Company, Member } from '@/lib/api/types';
 
 export function useEvents(filters?: { type?: string; upcoming?: boolean; past?: boolean }) {
   const { activeWorkspace } = useWorkspace();
@@ -33,7 +33,7 @@ export function useEvent(eventId: string | undefined) {
         event: CrmEvent;
         contacts: Contact[];
         members: Member[];
-        organizations: Organization[];
+        companies: Company[];
         tags: Array<{ tag_id: string; name: string; color: string | null }>;
       }>('get_event', wsId, { event_id: eventId }),
     enabled: !!wsId && !!eventId,

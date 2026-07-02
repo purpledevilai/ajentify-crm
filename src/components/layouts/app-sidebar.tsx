@@ -51,7 +51,7 @@ const COLLAPSE_KEY = 'ajentify_sidebar_collapsed';
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Contacts', href: '/contacts', icon: Users },
-  { label: 'Organizations', href: '/organizations', icon: Building2 },
+  { label: 'Companies', href: '/companies', icon: Building2 },
   { label: 'Deals', href: '/deals', icon: Handshake },
   { label: 'Events', href: '/events', icon: CalendarDays },
   { label: 'Tasks', href: '/tasks', icon: CheckSquare },

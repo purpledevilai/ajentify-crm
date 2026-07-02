@@ -44,7 +44,7 @@ export function useDeal(dealId: string | undefined) {
       wsRpc<{
         deal: Deal;
         contacts: Array<{ contact_id: string; first_name: string; last_name: string | null; role: string | null; [k: string]: unknown }>;
-        organizations: Array<{ organization_id: string; name: string; [k: string]: unknown }>;
+        companies: Array<{ company_id: string; name: string; [k: string]: unknown }>;
         tags: Array<{ tag_id: string; name: string; color: string | null }>;
       }>('get_deal', wsId, { deal_id: dealId }),
     enabled: !!wsId && !!dealId,

@@ -34,7 +34,7 @@ export function useContact(contactId: string | undefined) {
     queryFn: () =>
       wsRpc<{
         contact: Contact;
-        organizations: Array<{ organization_id: string; name: string; [k: string]: unknown }>;
+        companies: Array<{ company_id: string; name: string; [k: string]: unknown }>;
         tags: Array<{ tag_id: string; name: string; color: string | null }>;
         deal_relationships: Array<{ deal_id: string; role: string | null }>;
       }>('get_contact', wsId, { contact_id: contactId }),
