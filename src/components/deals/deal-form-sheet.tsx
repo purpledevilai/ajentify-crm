@@ -111,7 +111,7 @@ export function DealFormSheet({
     const numValue = data.value ? parseFloat(data.value) : 0;
     if (numValue > 0) params.value = numValue;
     if (data.expected_close_date) {
-      params.expected_close_date = new Date(data.expected_close_date).getTime();
+      params.expected_close_date = data.expected_close_date;
     }
     if (data.notes) params.notes = data.notes;
 

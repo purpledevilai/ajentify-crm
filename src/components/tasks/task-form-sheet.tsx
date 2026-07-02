@@ -67,7 +67,7 @@ export function TaskFormSheet({ open, onOpenChange, entityType, entityId }: Task
         title: data.title,
         description: data.description || null,
         priority: data.priority || 'medium',
-        due_date: data.due_date ? new Date(data.due_date).getTime() : null,
+        due_date: data.due_date || null,
         ...(entityType && entityId ? { entity_type: entityType, entity_id: entityId } : {}),
         status: 'pending',
       });

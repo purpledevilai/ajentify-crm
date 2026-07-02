@@ -119,8 +119,8 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
   async function onSubmit(data: EventFormValues) {
     const payload: Record<string, unknown> = {
       name: data.name,
-      start_date: datetimeLocalToEpoch(data.start_date),
-      end_date: data.end_date ? datetimeLocalToEpoch(data.end_date) : null,
+      start_date: data.start_date,
+      end_date: data.end_date || null,
       type: data.type || null,
       location: data.location || null,
       website: data.website || null,
