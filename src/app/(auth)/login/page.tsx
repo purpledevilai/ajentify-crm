@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,8 +33,11 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+
+  const redirectTo = searchParams.get('redirect');
 
   const {
     register,
@@ -47,7 +50,11 @@ export default function LoginPage() {
   async function onSubmit(data: LoginForm) {
     try {
       await login(data.email, data.password);
-      router.push('/dashboard');
+      if (redirectTo) {
+        window.location.href = redirectTo;
+      } else {
+        router.push('/dashboard');
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         const code = err.body.error_code;

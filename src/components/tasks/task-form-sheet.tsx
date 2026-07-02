@@ -86,7 +86,8 @@ export function TaskFormSheet({ open, onOpenChange, entityType, entityId }: Task
           <SheetTitle>Create Task</SheetTitle>
           <SheetDescription>Add a new task linked to this record.</SheetDescription>
         </SheetHeader>
-        <form id="task-form" onSubmit={handleSubmit(onSubmit)} className="flex-1 space-y-4 px-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4">
+        <form id="task-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-4">
           <div className="space-y-1.5">
             <Label htmlFor="task-title">Title *</Label>
             <Input
@@ -138,6 +139,7 @@ export function TaskFormSheet({ open, onOpenChange, entityType, entityId }: Task
             </div>
           </div>
         </form>
+        </div>
         <SheetFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
             Cancel

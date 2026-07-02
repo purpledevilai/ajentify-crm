@@ -24,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useCreateContact, useUpdateContact } from '@/lib/hooks/use-contacts';
 import { CONTACT_SOURCES, CONTACT_STATUSES } from '@/lib/utils/constants';
 import type { Contact } from '@/lib/api/types';
@@ -154,7 +153,7 @@ export function ContactFormSheet({ open, onOpenChange, contact }: ContactFormShe
               : 'Fill in the details to create a new contact.'}
           </SheetDescription>
         </SheetHeader>
-        <ScrollArea className="flex-1 px-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4">
           <form id="contact-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -278,7 +277,7 @@ export function ContactFormSheet({ open, onOpenChange, contact }: ContactFormShe
               />
             </div>
           </form>
-        </ScrollArea>
+        </div>
         <SheetFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
             Cancel

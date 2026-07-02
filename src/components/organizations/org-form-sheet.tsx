@@ -24,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useCreateOrganization, useUpdateOrganization } from '@/lib/hooks/use-organizations';
 import { ORGANIZATION_SIZES } from '@/lib/utils/constants';
 import type { Organization } from '@/lib/api/types';
@@ -141,7 +140,7 @@ export function OrgFormSheet({ open, onOpenChange, organization }: OrgFormSheetP
           </SheetDescription>
         </SheetHeader>
 
-        <ScrollArea className="flex-1 px-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4">
           <form
             id="org-form"
             onSubmit={form.handleSubmit(onSubmit)}
@@ -256,7 +255,7 @@ export function OrgFormSheet({ open, onOpenChange, organization }: OrgFormSheetP
               />
             </div>
           </form>
-        </ScrollArea>
+        </div>
 
         <SheetFooter>
           <Button

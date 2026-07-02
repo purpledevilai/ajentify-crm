@@ -94,7 +94,8 @@ export function ActivityFormSheet({
           <SheetTitle>Log Activity</SheetTitle>
           <SheetDescription>Record an activity for this record.</SheetDescription>
         </SheetHeader>
-        <form id="activity-form" onSubmit={handleSubmit(onSubmit)} className="flex-1 space-y-4 px-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4">
+        <form id="activity-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-4">
           <div className="space-y-1.5">
             <Label>Type *</Label>
             <Controller
@@ -139,6 +140,7 @@ export function ActivityFormSheet({
             />
           </div>
         </form>
+        </div>
         <SheetFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
             Cancel

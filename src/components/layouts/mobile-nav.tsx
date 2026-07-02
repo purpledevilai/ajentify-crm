@@ -5,7 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/providers/auth-provider';
+import { useWorkspace } from '@/lib/providers/workspace-provider';
 import { Separator } from '@/components/ui/separator';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from '@/components/ui/select';
 import {
   Sheet,
   SheetContent,
@@ -24,6 +31,7 @@ import {
   Activity,
   Settings,
   LogOut,
+  ChevronsUpDown,
 } from 'lucide-react';
 
 const tabs = [
@@ -43,6 +51,7 @@ const moreItems = [
 export function MobileNav() {
   const pathname = usePathname();
   const { logout } = useAuth();
+  const { activeWorkspace, setActiveWorkspace, workspaces } = useWorkspace();
   const [open, setOpen] = useState(false);
 
   return (
@@ -78,6 +87,35 @@ export function MobileNav() {
             <SheetTitle>Navigation</SheetTitle>
           </SheetHeader>
           <div className="grid gap-1 py-4">
+            {workspaces.length > 1 && (
+              <>
+                <div className="px-3 pb-1">
+                  <p className="mb-1.5 text-xs font-medium text-muted-foreground">Workspace</p>
+                  <Select
+                    value={activeWorkspace?.workspace_id ?? ''}
+                    onValueChange={(id) => {
+                      const ws = workspaces.find((w) => w.workspace_id === id);
+                      if (ws) setActiveWorkspace(ws);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <span className="flex items-center gap-2 truncate">
+                        <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        {activeWorkspace?.name ?? 'Select workspace'}
+                      </span>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {workspaces.map((ws) => (
+                        <SelectItem key={ws.workspace_id} value={ws.workspace_id}>
+                          {ws.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Separator className="my-1" />
+              </>
+            )}
             {moreItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
               return (

@@ -62,10 +62,13 @@ export default function DealsListPage() {
         description="View all your deals in a table format."
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" render={<Link href="/deals" />}>
+            <Link
+              href="/deals"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
               <LayoutGrid className="h-4 w-4" />
               Board View
-            </Button>
+            </Link>
             <Button onClick={() => { setEditingDeal(null); setFormOpen(true); }}>
               <Plus className="h-4 w-4" />
               Add Deal
@@ -152,10 +155,10 @@ export default function DealsListPage() {
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button variant="ghost" size="icon-sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                      <DropdownMenuTrigger
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleEdit(deal)}>

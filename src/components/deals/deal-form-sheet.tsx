@@ -131,7 +131,7 @@ export function DealFormSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="sm:max-w-md overflow-y-auto">
+      <SheetContent side="right" className="sm:max-w-md">
         <SheetHeader>
           <SheetTitle>{isEditing ? 'Edit Deal' : 'New Deal'}</SheetTitle>
           <SheetDescription>
@@ -141,7 +141,8 @@ export function DealFormSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 px-4 pb-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4">
+        <form id="deal-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 pb-4">
           <div className="space-y-1.5">
             <Label htmlFor="deal-name">Name *</Label>
             <Input
@@ -233,7 +234,10 @@ export function DealFormSheet({
             />
           </div>
 
-          <SheetFooter className="px-0 mt-2">
+        </form>
+        </div>
+
+        <SheetFooter>
             <Button
               type="button"
               variant="outline"
@@ -241,7 +245,7 @@ export function DealFormSheet({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" form="deal-form" disabled={isSubmitting}>
               {isSubmitting
                 ? isEditing
                   ? 'Updating...'
@@ -251,7 +255,6 @@ export function DealFormSheet({
                   : 'Create Deal'}
             </Button>
           </SheetFooter>
-        </form>
       </SheetContent>
     </Sheet>
   );

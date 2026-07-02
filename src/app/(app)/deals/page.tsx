@@ -268,10 +268,13 @@ export default function DealsPage() {
                 Pipeline: {formatCurrency(totalPipelineValue)}
               </span>
             )}
-            <Button variant="outline" size="sm" render={<Link href="/deals/list" />}>
+            <Link
+              href="/deals/list"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
               <List className="h-4 w-4" />
               List View
-            </Button>
+            </Link>
             <Button onClick={() => handleAddDeal()}>
               <Plus className="h-4 w-4" />
               Add Deal

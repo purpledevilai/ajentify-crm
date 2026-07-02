@@ -1,7 +1,6 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './auth-provider';
 import type { Workspace } from '@/lib/api/types';
 
@@ -17,31 +16,38 @@ const STORAGE_KEY = 'ajentify_active_workspace';
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const { workspaces } = useAuth();
-  const queryClient = useQueryClient();
   const [activeWorkspace, setActiveState] = useState<Workspace | null>(null);
-  const prevWorkspaceId = useRef<string | null>(null);
+  const initialized = useRef(false);
 
   useEffect(() => {
     if (workspaces.length === 0) {
       setActiveState(null);
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem(STORAGE_KEY);
+      // Only clear storage if we previously had workspaces (user genuinely has none now).
+      // Don't clear on initial mount when auth hasn't loaded yet.
+      if (initialized.current) {
+        initialized.current = false;
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(STORAGE_KEY);
+        }
       }
       return;
     }
 
-    const savedId = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
-    const saved = workspaces.find((w) => w.workspace_id === savedId);
-    setActiveState(saved ?? workspaces[0]);
-  }, [workspaces]);
-
-  useEffect(() => {
-    const currentId = activeWorkspace?.workspace_id ?? null;
-    if (prevWorkspaceId.current !== null && currentId !== null && prevWorkspaceId.current !== currentId) {
-      queryClient.removeQueries();
+    if (!initialized.current) {
+      const savedId = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
+      const saved = workspaces.find((w) => w.workspace_id === savedId);
+      setActiveState(saved ?? workspaces[0]);
+      initialized.current = true;
+      return;
     }
-    prevWorkspaceId.current = currentId;
-  }, [activeWorkspace, queryClient]);
+
+    // After init, only update if the current active workspace was removed
+    if (activeWorkspace && !workspaces.find((w) => w.workspace_id === activeWorkspace.workspace_id)) {
+      const savedId = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
+      const saved = workspaces.find((w) => w.workspace_id === savedId);
+      setActiveState(saved ?? workspaces[0]);
+    }
+  }, [workspaces]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setActiveWorkspace = useCallback((workspace: Workspace) => {
     setActiveState(workspace);

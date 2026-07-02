@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Shield } from 'lucide-react';
+import { Shield, ExternalLink } from 'lucide-react';
 
 const SCOPE_DESCRIPTIONS: Record<string, string> = {
   'crm:read': 'Read your contacts, deals, events, and other CRM data',
@@ -23,6 +23,24 @@ const SCOPE_DESCRIPTIONS: Record<string, string> = {
 interface AuthorizeResponse {
   redirect_uri: string;
   code: string;
+}
+
+interface ClientMetadata {
+  client_id: string;
+  client_name?: string;
+  logo_uri?: string;
+  client_uri?: string;
+  policy_uri?: string;
+  tos_uri?: string;
+}
+
+function isHttpsUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:';
+  } catch {
+    return false;
+  }
 }
 
 export default function OAuthAuthorizePage() {
@@ -37,6 +55,8 @@ function OAuthAuthorizeContent() {
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading } = useAuth();
   const [authorizing, setAuthorizing] = useState(false);
+  const [clientMeta, setClientMeta] = useState<ClientMetadata | null>(null);
+  const [metaLoading, setMetaLoading] = useState(false);
 
   const clientId = searchParams.get('client_id') ?? '';
   const redirectUri = searchParams.get('redirect_uri') ?? '';
@@ -54,6 +74,20 @@ function OAuthAuthorizeContent() {
       window.location.href = `/login?redirect=${encodeURIComponent(currentUrl)}`;
     }
   }, [isLoading, isAuthenticated]);
+
+  useEffect(() => {
+    if (!clientId || !isHttpsUrl(clientId)) return;
+    setMetaLoading(true);
+    fetch(clientId, { headers: { accept: 'application/json' } })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.client_id === clientId) {
+          setClientMeta(data as ClientMetadata);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setMetaLoading(false));
+  }, [clientId]);
 
   async function handleAuthorize() {
     setAuthorizing(true);
@@ -88,6 +122,10 @@ function OAuthAuthorizeContent() {
     );
   }
 
+  const displayName = clientMeta?.client_name ?? null;
+  const logoUri = clientMeta?.logo_uri ?? null;
+  const clientUri = clientMeta?.client_uri ?? null;
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-muted/50 to-background px-4 py-12">
       <div className="mb-8 text-center">
@@ -101,16 +139,53 @@ function OAuthAuthorizeContent() {
         <CardHeader className="text-center">
           <CardTitle>Authorize Application</CardTitle>
           <CardDescription>
-            An application is requesting access to your account
+            {displayName
+              ? `"${displayName}" is requesting access to your account`
+              : 'An application is requesting access to your account'}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <div className="rounded-md border p-3">
-            <p className="text-sm font-medium text-muted-foreground">
-              Client ID
-            </p>
-            <p className="mt-0.5 text-sm font-mono break-all">{clientId}</p>
+            {metaLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <span className="text-sm text-muted-foreground">Loading client info...</span>
+              </div>
+            ) : displayName ? (
+              <div className="flex items-center gap-3">
+                {logoUri && (
+                  <img
+                    src={logoUri}
+                    alt={displayName}
+                    className="h-10 w-10 shrink-0 rounded-md object-contain"
+                  />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold">{displayName}</p>
+                  {clientUri ? (
+                    <a
+                      href={clientUri}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:underline"
+                    >
+                      {new URL(clientUri).hostname}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  ) : (
+                    <p className="truncate text-xs text-muted-foreground">{clientId}</p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Client ID
+                </p>
+                <p className="mt-0.5 text-sm font-mono break-all">{clientId}</p>
+              </>
+            )}
           </div>
 
           {scopes.length > 0 && (
@@ -137,9 +212,9 @@ function OAuthAuthorizeContent() {
           <Button
             className="w-full"
             onClick={handleAuthorize}
-            disabled={authorizing}
+            disabled={authorizing || metaLoading}
           >
-            {authorizing ? 'Authorizing…' : 'Authorize'}
+            {authorizing ? 'Authorizing...' : 'Authorize'}
           </Button>
           <Button
             variant="outline"

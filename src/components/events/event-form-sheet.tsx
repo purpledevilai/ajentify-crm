@@ -24,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useCreateEvent, useUpdateEvent } from '@/lib/hooks/use-events';
 import type { CrmEvent } from '@/lib/api/types';
 
@@ -157,7 +156,7 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
               : 'Fill in the details to create a new event.'}
           </SheetDescription>
         </SheetHeader>
-        <ScrollArea className="flex-1 px-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4">
           <form id="event-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-4">
             <div className="space-y-1.5">
               <Label htmlFor="name">Event name *</Label>
@@ -259,7 +258,7 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
               />
             </div>
           </form>
-        </ScrollArea>
+        </div>
         <SheetFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
             Cancel
