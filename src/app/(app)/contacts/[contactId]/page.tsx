@@ -167,7 +167,7 @@ export default function ContactDetailPage() {
               <Separator className="my-4" />
 
               {/* Quick actions */}
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
                   size="sm"
