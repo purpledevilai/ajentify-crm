@@ -248,8 +248,14 @@ export default function CompanyDetailPage() {
 
         {/* Right Column */}
         <div className="space-y-6">
-          <ActivityTimeline entityType="company" entityId={companyId} />
-          <EntityTasks entityType="company" entityId={companyId} />
+          <Card className="p-5">
+            <h3 className="text-sm font-semibold mb-3">Activity</h3>
+            <ActivityTimeline entityType="company" entityId={companyId} />
+          </Card>
+
+          <Card className="p-5">
+            <EntityTasks entityType="company" entityId={companyId} />
+          </Card>
         </div>
       </div>
 
