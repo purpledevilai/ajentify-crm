@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +25,6 @@ import { EventFormSheet } from '@/components/events/event-form-sheet';
 import { ActivityTimeline } from '@/components/shared/activity-timeline';
 import { useEvent, useDeleteEvent } from '@/lib/hooks/use-events';
 import { formatFullDate } from '@/lib/utils/format';
-import { getInitials, formatContactName } from '@/lib/utils/format';
 import {
   Pencil,
   Trash2,
@@ -34,10 +32,10 @@ import {
   Globe,
   Clock,
   CalendarDays,
-  Users,
   Building2,
   UserCircle,
 } from 'lucide-react';
+import { RelatedEntitiesCard } from '@/components/shared/related-entities-card';
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
   conference: 'Conference',
@@ -98,7 +96,7 @@ export default function EventDetailPage() {
     );
   }
 
-  const { event, contacts, members, companies, tags } = data;
+  const { event, tags } = data;
 
   return (
     <div className="space-y-6">
@@ -220,95 +218,24 @@ export default function EventDetailPage() {
             </CardContent>
           </Card>
 
-          {members.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Team Attending
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {members.map((m) => (
-                    <div key={m.member_id} className="flex items-center gap-3">
-                      <Avatar size="sm">
-                        {m.avatar_url && <AvatarImage src={m.avatar_url} />}
-                        <AvatarFallback>
-                          {getInitials(`${m.first_name} ${m.last_name}`)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-sm font-medium">{m.first_name} {m.last_name}</p>
-                        <p className="text-xs text-muted-foreground">{m.email}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {companies.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
-                  Companies
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {companies.map((org) => (
-                    <div key={org.company_id} className="flex items-center gap-3">
-                      <Avatar size="sm">
-                        {org.logo_url && <AvatarImage src={org.logo_url} />}
-                        <AvatarFallback>{getInitials(org.name)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-sm font-medium">{org.name}</p>
-                        {org.industry && (
-                          <p className="text-xs text-muted-foreground">{org.industry}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <RelatedEntitiesCard
+            title="Companies"
+            icon={Building2}
+            entityType="event"
+            entityId={eventId}
+            relatedType="company"
+          />
         </div>
 
         {/* Right column */}
         <div className="space-y-6">
-          {contacts.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <UserCircle className="h-4 w-4" />
-                  Contacts Met
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {contacts.map((c) => (
-                    <div key={c.contact_id} className="flex items-center gap-3">
-                      <Avatar size="sm">
-                        {c.avatar_url && <AvatarImage src={c.avatar_url} />}
-                        <AvatarFallback>{getInitials(formatContactName(c))}</AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{formatContactName(c)}</p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {[c.job_title, c.company_name].filter(Boolean).join(' at ') || c.email}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <RelatedEntitiesCard
+            title="Contacts Met"
+            icon={UserCircle}
+            entityType="event"
+            entityId={eventId}
+            relatedType="contact"
+          />
 
           <Card>
             <CardHeader>

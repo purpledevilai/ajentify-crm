@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { PageHeader } from '@/components/layouts/page-header';
 import { CompanyFormSheet } from '@/components/companies/company-form-sheet';
 import { ActivityTimeline } from '@/components/shared/activity-timeline';
@@ -36,8 +35,10 @@ import {
   Trash2,
   Users,
   ExternalLink,
+  Handshake,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { RelatedEntitiesCard } from '@/components/shared/related-entities-card';
 
 function getSizeLabel(value: string | null): string | null {
   if (!value) return null;
@@ -57,7 +58,6 @@ export default function CompanyDetailPage() {
   const deleteCompanyMutation = useDeleteCompany();
 
   const company = data?.company;
-  const contacts = data?.contacts ?? [];
   const tags = data?.tags ?? [];
 
   function handleDelete() {
@@ -228,52 +228,22 @@ export default function CompanyDetailPage() {
             </div>
           </Card>
 
-          <Card className="p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-semibold flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                People ({contacts.length})
-              </h3>
-            </div>
-            {contacts.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No contacts associated with this company.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {contacts.map((contact) => (
-                  <Link
-                    key={contact.contact_id}
-                    href={`/contacts/${contact.contact_id}`}
-                    className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50"
-                  >
-                    <Avatar size="sm">
-                      <AvatarFallback>
-                        {getInitials(
-                          `${contact.first_name} ${contact.last_name ?? ''}`.trim(),
-                        )}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {contact.first_name} {contact.last_name ?? ''}
-                      </p>
-                      {contact.job_title && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {contact.job_title}
-                        </p>
-                      )}
-                    </div>
-                    {contact.email && (
-                      <span className="hidden text-xs text-muted-foreground sm:inline truncate max-w-[160px]">
-                        {contact.email}
-                      </span>
-                    )}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </Card>
+          <RelatedEntitiesCard
+            title="People"
+            icon={Users}
+            entityType="company"
+            entityId={companyId}
+            relatedType="contact"
+            emptyMessage="No contacts associated with this company."
+          />
+
+          <RelatedEntitiesCard
+            title="Deals"
+            icon={Handshake}
+            entityType="company"
+            entityId={companyId}
+            relatedType="deal"
+          />
         </div>
 
         {/* Right Column */}

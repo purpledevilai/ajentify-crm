@@ -25,7 +25,7 @@ import { usePipelineStages } from '@/lib/hooks/use-pipeline';
 import { DealFormSheet } from '@/components/deals/deal-form-sheet';
 import { ActivityTimeline } from '@/components/shared/activity-timeline';
 import { EntityTasks } from '@/components/shared/entity-tasks';
-import { formatCurrency, formatDate, getInitials } from '@/lib/utils/format';
+import { formatCurrency, formatDate } from '@/lib/utils/format';
 import { DEAL_STAGE_COLORS } from '@/lib/utils/constants';
 import {
   Pencil,
@@ -39,6 +39,7 @@ import {
   Tag,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { RelatedEntitiesCard } from '@/components/shared/related-entities-card';
 
 export default function DealDetailPage() {
   const params = useParams();
@@ -52,8 +53,6 @@ export default function DealDetailPage() {
   const [formOpen, setFormOpen] = useState(false);
 
   const deal = data?.deal;
-  const contacts = data?.contacts ?? [];
-  const companies = data?.companies ?? [];
   const tags = data?.tags ?? [];
   const stages = stagesData?.stages?.sort((a, b) => a.order - b.order) ?? [];
 
@@ -293,68 +292,21 @@ export default function DealDetailPage() {
             )}
           </Card>
 
-          {/* Key People */}
-          {contacts.length > 0 && (
-            <Card className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-sm font-semibold">Key People</h3>
-              </div>
-              <div className="space-y-2">
-                {contacts.map((contact) => (
-                  <div
-                    key={contact.contact_id}
-                    className="flex items-center gap-3 rounded-lg border p-2.5"
-                  >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
-                      {getInitials(
-                        `${contact.first_name} ${contact.last_name ?? ''}`
-                      )}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <Link
-                        href={`/contacts/${contact.contact_id}`}
-                        className="text-sm font-medium hover:underline"
-                      >
-                        {contact.first_name} {contact.last_name ?? ''}
-                      </Link>
-                      {contact.role && (
-                        <p className="text-xs text-muted-foreground">{contact.role}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
+          <RelatedEntitiesCard
+            title="Key People"
+            icon={Users}
+            entityType="deal"
+            entityId={dealId}
+            relatedType="contact"
+          />
 
-          {/* Companies */}
-          {companies.length > 0 && (
-            <Card className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <Building2 className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-sm font-semibold">Companies</h3>
-              </div>
-              <div className="space-y-2">
-                {companies.map((org) => (
-                  <div
-                    key={org.company_id}
-                    className="flex items-center gap-3 rounded-lg border p-2.5"
-                  >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-xs font-medium">
-                      {getInitials(org.name)}
-                    </span>
-                    <Link
-                      href={`/companies/${org.company_id}`}
-                      className="text-sm font-medium hover:underline"
-                    >
-                      {org.name}
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
+          <RelatedEntitiesCard
+            title="Companies"
+            icon={Building2}
+            entityType="deal"
+            entityId={dealId}
+            relatedType="company"
+          />
 
           {/* Tags */}
           {tags.length > 0 && (

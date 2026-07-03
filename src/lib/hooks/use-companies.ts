@@ -5,15 +5,15 @@ import { wsRpc } from '@/lib/api/rpc';
 import { useWorkspace } from '@/lib/providers/workspace-provider';
 import type { Company } from '@/lib/api/types';
 
-export function useCompanies() {
+export function useCompanies(search?: string) {
   const { activeWorkspace } = useWorkspace();
   const wsId = activeWorkspace?.workspace_id ?? '';
 
   return useInfiniteQuery({
-    queryKey: ['companies', wsId],
+    queryKey: ['companies', wsId, search],
     queryFn: async ({ pageParam }) => {
       return wsRpc<{ companies: Company[]; nextCursor?: string }>(
-        'list_companies', wsId, { cursor: pageParam, limit: 50 },
+        'list_companies', wsId, { cursor: pageParam, limit: 50, ...(search ? { q: search } : {}) },
       );
     },
     initialPageParam: undefined as string | undefined,
@@ -31,7 +31,6 @@ export function useCompany(companyId: string | undefined) {
     queryFn: () =>
       wsRpc<{
         company: Company;
-        contacts: Array<{ contact_id: string; first_name: string; last_name: string | null; email: string | null; job_title: string | null; [k: string]: unknown }>;
         tags: Array<{ tag_id: string; name: string; color: string | null }>;
       }>('get_company', wsId, { company_id: companyId }),
     enabled: !!wsId && !!companyId,

@@ -16,6 +16,7 @@ import {
   Building2,
   Handshake,
 } from 'lucide-react';
+import { RelatedEntitiesCard } from '@/components/shared/related-entities-card';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/layouts/page-header';
 import { Button } from '@/components/ui/button';
@@ -41,7 +42,7 @@ import { ActivityFormSheet } from '@/components/activities/activity-form-sheet';
 import { TaskFormSheet } from '@/components/tasks/task-form-sheet';
 import { useContact, useDeleteContact } from '@/lib/hooks/use-contacts';
 import { CONTACT_STATUSES } from '@/lib/utils/constants';
-import { formatContactName, getInitials, formatDate } from '@/lib/utils/format';
+import { formatContactName, getInitials } from '@/lib/utils/format';
 
 export default function ContactDetailPage() {
   const params = useParams<{ contactId: string }>();
@@ -57,9 +58,7 @@ export default function ContactDetailPage() {
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
 
   const contact = data?.contact;
-  const companies = data?.companies ?? [];
   const tags = data?.tags ?? [];
-  const dealRelationships = data?.deal_relationships ?? [];
 
   const handleDelete = async () => {
     if (!contactId) return;
@@ -245,56 +244,21 @@ export default function ContactDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Companies */}
-          {companies.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Companies</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {companies.map((org) => (
-                    <Link
-                      key={org.company_id}
-                      href={`/companies/${org.company_id}`}
-                      className="flex items-center gap-2 rounded-md p-2 hover:bg-muted/50 transition-colors"
-                    >
-                      <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">{org.name}</span>
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <RelatedEntitiesCard
+            title="Companies"
+            icon={Building2}
+            entityType="contact"
+            entityId={contactId}
+            relatedType="company"
+          />
 
-          {/* Deals */}
-          {dealRelationships.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Deals</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {dealRelationships.map((deal) => (
-                    <Link
-                      key={deal.deal_id}
-                      href={`/deals/${deal.deal_id}`}
-                      className="flex items-center gap-2 rounded-md p-2 hover:bg-muted/50 transition-colors"
-                    >
-                      <Handshake className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">Deal</span>
-                      {deal.role && (
-                        <Badge variant="outline" className="ml-auto text-xs">
-                          {deal.role}
-                        </Badge>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <RelatedEntitiesCard
+            title="Deals"
+            icon={Handshake}
+            entityType="contact"
+            entityId={contactId}
+            relatedType="deal"
+          />
         </div>
 
         {/* Right column */}
