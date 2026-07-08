@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
-import { wsRpc } from '@/lib/api/rpc';
+import { rpc, wsRpc } from '@/lib/api/rpc';
 import { useWorkspace } from '@/lib/providers/workspace-provider';
 import type { Task } from '@/lib/api/types';
 
@@ -51,7 +51,7 @@ export function useUpdateTask() {
 
   return useMutation({
     mutationFn: (params: { task_id: string } & Record<string, unknown>) =>
-      wsRpc<{ task: Task }>('update_task', wsId, params),
+      rpc<{ task: Task }>('update_task', params),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['tasks', wsId] });
       qc.invalidateQueries({ queryKey: ['dashboard', wsId] });
@@ -66,7 +66,7 @@ export function useDeleteTask() {
 
   return useMutation({
     mutationFn: (taskId: string) =>
-      wsRpc<{ deleted: boolean }>('delete_task', wsId, { task_id: taskId }),
+      rpc<{ deleted: boolean }>('delete_task', { task_id: taskId }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['tasks', wsId] });
       qc.invalidateQueries({ queryKey: ['dashboard', wsId] });

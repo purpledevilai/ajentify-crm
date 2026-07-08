@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
-import { wsRpc } from '@/lib/api/rpc';
+import { rpc, wsRpc } from '@/lib/api/rpc';
 import { useWorkspace } from '@/lib/providers/workspace-provider';
 import type { Deal, PipelineStage } from '@/lib/api/types';
 
@@ -35,17 +35,14 @@ export function usePipeline() {
 }
 
 export function useDeal(dealId: string | undefined) {
-  const { activeWorkspace } = useWorkspace();
-  const wsId = activeWorkspace?.workspace_id ?? '';
-
   return useQuery({
-    queryKey: ['deal', wsId, dealId],
+    queryKey: ['deal', dealId],
     queryFn: () =>
-      wsRpc<{
+      rpc<{
         deal: Deal;
         tags: Array<{ tag_id: string; name: string; color: string | null }>;
-      }>('get_deal', wsId, { deal_id: dealId }),
-    enabled: !!wsId && !!dealId,
+      }>('get_deal', { deal_id: dealId }),
+    enabled: !!dealId,
   });
 }
 
@@ -72,10 +69,10 @@ export function useUpdateDeal() {
 
   return useMutation({
     mutationFn: (params: { deal_id: string } & Record<string, unknown>) =>
-      wsRpc<{ deal: Deal }>('update_deal', wsId, params),
+      rpc<{ deal: Deal }>('update_deal', params),
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: ['deals', wsId] });
-      qc.invalidateQueries({ queryKey: ['deal', wsId, vars.deal_id] });
+      qc.invalidateQueries({ queryKey: ['deal', vars.deal_id] });
       qc.invalidateQueries({ queryKey: ['pipeline', wsId] });
       qc.invalidateQueries({ queryKey: ['dashboard', wsId] });
     },
@@ -89,7 +86,7 @@ export function useDeleteDeal() {
 
   return useMutation({
     mutationFn: (dealId: string) =>
-      wsRpc<{ deleted: boolean }>('delete_deal', wsId, { deal_id: dealId }),
+      rpc<{ deleted: boolean }>('delete_deal', { deal_id: dealId }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['deals', wsId] });
       qc.invalidateQueries({ queryKey: ['pipeline', wsId] });

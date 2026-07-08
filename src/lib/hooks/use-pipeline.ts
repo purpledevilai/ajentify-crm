@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { wsRpc } from '@/lib/api/rpc';
+import { rpc, wsRpc } from '@/lib/api/rpc';
 import { useWorkspace } from '@/lib/providers/workspace-provider';
 import type { PipelineStage } from '@/lib/api/types';
 
@@ -38,7 +38,7 @@ export function useUpdatePipelineStage() {
 
   return useMutation({
     mutationFn: (params: { stage_id: string; name?: string; color?: string; is_closed?: boolean; is_won?: boolean }) =>
-      wsRpc<{ stage: PipelineStage }>('update_pipeline_stage', wsId, params),
+      rpc<{ stage: PipelineStage }>('update_pipeline_stage', params),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['pipeline-stages', wsId] });
       qc.invalidateQueries({ queryKey: ['pipeline', wsId] });
@@ -53,7 +53,7 @@ export function useDeletePipelineStage() {
 
   return useMutation({
     mutationFn: (stageId: string) =>
-      wsRpc<{ deleted: boolean }>('delete_pipeline_stage', wsId, { stage_id: stageId }),
+      rpc<{ deleted: boolean }>('delete_pipeline_stage', { stage_id: stageId }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['pipeline-stages', wsId] });
       qc.invalidateQueries({ queryKey: ['pipeline', wsId] });

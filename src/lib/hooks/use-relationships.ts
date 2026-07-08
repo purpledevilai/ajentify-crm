@@ -1,8 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { wsRpc } from '@/lib/api/rpc';
-import { useWorkspace } from '@/lib/providers/workspace-provider';
+import { rpc } from '@/lib/api/rpc';
 
 export interface HydratedRelationship {
   relationship_id: string;
@@ -14,58 +13,66 @@ export interface HydratedRelationship {
   created_at: number;
 }
 
+const ID_FIELD: Record<string, string> = {
+  contact: 'contact_id',
+  company: 'company_id',
+  deal: 'deal_id',
+  event: 'event_id',
+  task: 'task_id',
+  tag: 'tag_id',
+  activity: 'activity_id',
+};
+
 export function useRelationships(
   entityType: string,
   entityId: string | undefined,
   relatedType?: string,
 ) {
-  const { activeWorkspace } = useWorkspace();
-  const wsId = activeWorkspace?.workspace_id ?? '';
+  const idField = ID_FIELD[entityType];
 
   return useQuery({
-    queryKey: ['relationships', wsId, entityType, entityId, relatedType],
+    queryKey: ['relationships', entityType, entityId, relatedType],
     queryFn: () =>
-      wsRpc<{ relationships: HydratedRelationship[] }>('list_relationships', wsId, {
-        entity_type: entityType,
-        entity_id: entityId,
+      rpc<{ relationships: HydratedRelationship[] }>(`list_${entityType}_relationships`, {
+        [idField]: entityId,
         ...(relatedType ? { related_type: relatedType } : {}),
       }),
-    enabled: !!wsId && !!entityId,
+    enabled: !!entityId,
     select: (data) => data.relationships,
   });
 }
 
-export function useCreateRelationship() {
+export function useCreateRelationship(entityType: string, entityId: string) {
   const qc = useQueryClient();
-  const { activeWorkspace } = useWorkspace();
-  const wsId = activeWorkspace?.workspace_id ?? '';
+  const idField = ID_FIELD[entityType];
 
   return useMutation({
     mutationFn: (params: {
-      entity_type_a: string;
-      entity_id_a: string;
-      entity_type_b: string;
-      entity_id_b: string;
+      related_entity_type: string;
+      related_entity_id: string;
       metadata?: Record<string, unknown>;
-    }) => wsRpc<{ relationship: unknown }>('create_relationship', wsId, params),
+    }) => rpc<{ relationship: unknown }>(`create_${entityType}_relationship`, {
+      [idField]: entityId,
+      ...params,
+    }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['relationships', wsId] });
+      qc.invalidateQueries({ queryKey: ['relationships'] });
     },
   });
 }
 
-export function useDeleteRelationship() {
+export function useDeleteRelationship(entityType: string, entityId: string) {
   const qc = useQueryClient();
-  const { activeWorkspace } = useWorkspace();
-  const wsId = activeWorkspace?.workspace_id ?? '';
+  const idField = ID_FIELD[entityType];
 
   return useMutation({
     mutationFn: (relationshipId: string) =>
-      wsRpc<{ deleted: boolean }>('delete_relationship', wsId, {
+      rpc<{ deleted: boolean }>(`delete_${entityType}_relationship`, {
+        [idField]: entityId,
         relationship_id: relationshipId,
       }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['relationships', wsId] });
+      qc.invalidateQueries({ queryKey: ['relationships'] });
     },
   });
 }

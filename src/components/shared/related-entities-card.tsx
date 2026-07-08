@@ -131,8 +131,8 @@ export function RelatedEntitiesCard({
   emptyMessage,
 }: RelatedEntitiesCardProps) {
   const { data: relationships = [], isLoading } = useRelationships(entityType, entityId, relatedType);
-  const createRel = useCreateRelationship();
-  const deleteRel = useDeleteRelationship();
+  const createRel = useCreateRelationship(entityType, entityId);
+  const deleteRel = useDeleteRelationship(entityType, entityId);
 
   const excludeIds = relationships.map((r) => r.related_entity_id);
 
@@ -141,10 +141,8 @@ export function RelatedEntitiesCard({
     const relatedId = entity[idKey] as string;
     createRel.mutate(
       {
-        entity_type_a: entityType,
-        entity_id_a: entityId,
-        entity_type_b: relatedType,
-        entity_id_b: relatedId,
+        related_entity_type: relatedType,
+        related_entity_id: relatedId,
       },
       {
         onSuccess: () => {

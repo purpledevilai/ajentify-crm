@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
-import { wsRpc } from '@/lib/api/rpc';
+import { rpc, wsRpc } from '@/lib/api/rpc';
 import { useWorkspace } from '@/lib/providers/workspace-provider';
 import type { Activity } from '@/lib/api/types';
 
@@ -55,7 +55,7 @@ export function useDeleteActivity() {
 
   return useMutation({
     mutationFn: (activityId: string) =>
-      wsRpc<{ deleted: boolean }>('delete_activity', wsId, { activity_id: activityId }),
+      rpc<{ deleted: boolean }>('delete_activity', { activity_id: activityId }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['activities', wsId] });
     },

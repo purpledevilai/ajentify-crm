@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { wsRpc } from '@/lib/api/rpc';
+import { rpc, wsRpc } from '@/lib/api/rpc';
 import { useWorkspace } from '@/lib/providers/workspace-provider';
 import type { Tag } from '@/lib/api/types';
 
@@ -37,7 +37,7 @@ export function useUpdateTag() {
 
   return useMutation({
     mutationFn: (params: { tag_id: string; name?: string; color?: string }) =>
-      wsRpc<{ tag: Tag }>('update_tag', wsId, params),
+      rpc<{ tag: Tag }>('update_tag', params),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['tags', wsId] });
     },
@@ -51,7 +51,7 @@ export function useDeleteTag() {
 
   return useMutation({
     mutationFn: (tagId: string) =>
-      wsRpc<{ deleted: boolean }>('delete_tag', wsId, { tag_id: tagId }),
+      rpc<{ deleted: boolean }>('delete_tag', { tag_id: tagId }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['tags', wsId] });
     },

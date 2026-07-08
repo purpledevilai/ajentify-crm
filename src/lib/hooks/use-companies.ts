@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
-import { wsRpc } from '@/lib/api/rpc';
+import { rpc, wsRpc } from '@/lib/api/rpc';
 import { useWorkspace } from '@/lib/providers/workspace-provider';
 import type { Company } from '@/lib/api/types';
 
@@ -23,17 +23,14 @@ export function useCompanies(search?: string) {
 }
 
 export function useCompany(companyId: string | undefined) {
-  const { activeWorkspace } = useWorkspace();
-  const wsId = activeWorkspace?.workspace_id ?? '';
-
   return useQuery({
-    queryKey: ['company', wsId, companyId],
+    queryKey: ['company', companyId],
     queryFn: () =>
-      wsRpc<{
+      rpc<{
         company: Company;
         tags: Array<{ tag_id: string; name: string; color: string | null }>;
-      }>('get_company', wsId, { company_id: companyId }),
-    enabled: !!wsId && !!companyId,
+      }>('get_company', { company_id: companyId }),
+    enabled: !!companyId,
   });
 }
 
@@ -58,10 +55,10 @@ export function useUpdateCompany() {
 
   return useMutation({
     mutationFn: (params: { company_id: string } & Record<string, unknown>) =>
-      wsRpc<{ company: Company }>('update_company', wsId, params),
+      rpc<{ company: Company }>('update_company', params),
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: ['companies', wsId] });
-      qc.invalidateQueries({ queryKey: ['company', wsId, vars.company_id] });
+      qc.invalidateQueries({ queryKey: ['company', vars.company_id] });
     },
   });
 }
@@ -73,7 +70,7 @@ export function useDeleteCompany() {
 
   return useMutation({
     mutationFn: (companyId: string) =>
-      wsRpc<{ deleted: boolean }>('delete_company', wsId, { company_id: companyId }),
+      rpc<{ deleted: boolean }>('delete_company', { company_id: companyId }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['companies', wsId] });
     },

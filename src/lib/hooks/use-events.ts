@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
-import { wsRpc } from '@/lib/api/rpc';
+import { rpc, wsRpc } from '@/lib/api/rpc';
 import { useWorkspace } from '@/lib/providers/workspace-provider';
 import type { CrmEvent } from '@/lib/api/types';
 
@@ -23,17 +23,14 @@ export function useEvents(filters?: { type?: string; upcoming?: boolean; past?: 
 }
 
 export function useEvent(eventId: string | undefined) {
-  const { activeWorkspace } = useWorkspace();
-  const wsId = activeWorkspace?.workspace_id ?? '';
-
   return useQuery({
-    queryKey: ['event', wsId, eventId],
+    queryKey: ['event', eventId],
     queryFn: () =>
-      wsRpc<{
+      rpc<{
         event: CrmEvent;
         tags: Array<{ tag_id: string; name: string; color: string | null }>;
-      }>('get_event', wsId, { event_id: eventId }),
-    enabled: !!wsId && !!eventId,
+      }>('get_event', { event_id: eventId }),
+    enabled: !!eventId,
   });
 }
 
@@ -59,10 +56,10 @@ export function useUpdateEvent() {
 
   return useMutation({
     mutationFn: (params: { event_id: string } & Record<string, unknown>) =>
-      wsRpc<{ event: CrmEvent }>('update_event', wsId, params),
+      rpc<{ event: CrmEvent }>('update_event', params),
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: ['events', wsId] });
-      qc.invalidateQueries({ queryKey: ['event', wsId, vars.event_id] });
+      qc.invalidateQueries({ queryKey: ['event', vars.event_id] });
     },
   });
 }
@@ -74,7 +71,7 @@ export function useDeleteEvent() {
 
   return useMutation({
     mutationFn: (eventId: string) =>
-      wsRpc<{ deleted: boolean }>('delete_event', wsId, { event_id: eventId }),
+      rpc<{ deleted: boolean }>('delete_event', { event_id: eventId }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['events', wsId] });
       qc.invalidateQueries({ queryKey: ['dashboard', wsId] });
